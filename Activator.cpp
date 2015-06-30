@@ -40,6 +40,8 @@ sl::ax::engine::AutexousiousService* Activator::getAxService() const {
 }
 
 void Activator::Load(ModuleContext* context) {
+	ModuleSettings::SetAutoLoadingEnabled(true);
+
 	this->context = context;
 	this->context->AddServiceListener(this, &Activator::ServiceChanged);
 

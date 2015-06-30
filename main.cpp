@@ -25,9 +25,7 @@
 
 US_USE_NAMESPACE
 
-#ifdef US_BUILD_SHARED_LIBS
-	#include <azriel/usbundleloader/BundleLoader.h>
-#else
+#ifndef US_BUILD_SHARED_LIBS
 	#include <azriel/cppmicroservices/core/include/usModuleImport.h>
 	US_IMPORT_MODULE(CppMicroServices)
 	US_IMPORT_MODULE(sl_core_application)
@@ -39,21 +37,27 @@ US_USE_NAMESPACE
 #include "Activator.h"
 
 int main(int argc, char const *argv[]) {
-	ModuleSettings::SetAutoLoadingEnabled(true);
-	auto appPath = ModuleSettings::CURRENT_MODULE_PATH();
-	printf("current module path: %s\n", appPath.c_str());
-
+	printf(" === Auto load dirs ===\n");
 	auto autoLoadPaths = ModuleSettings::GetAutoLoadPaths();
 	for (auto path : autoLoadPaths) {
 		printf("auto load: %s\n", path.c_str());
 	}
-#ifdef US_BUILD_SHARED_LIBS
-	BundleLoader bundleLoader;
-	bundleLoader.load("bii/build/azriel_sl_core_application/libazriel_sl_core_application.so");
-	bundleLoader.load("bii/build/azriel_sl_ax_engine/libazriel_sl_ax_engine.so");
-#endif
 
+	printf("\n");
+	printf(" === Module Locations ===\n");
 	ModuleContext* mc = GetModuleContext();
+	auto modules = mc->GetModules();
+	for (auto module : modules) {
+		printf("%s: %s\n", module->GetName().c_str(), module->GetLocation().c_str());
+	}
+
+	printf("\n");
+	printf(" === Module Properties ===\n");
+	for (auto module : modules) {
+		printf("  == %s\n ==", module->GetName().c_str());
+		printf("  module.autoload_dir: %s\n", module->GetProperty("module.autoload_dir").ToString().c_str());
+	}
+
 	auto axServiceReferenceU = mc->GetServiceReference("sl::ax::engine::AutexousiousService");
 	auto axServiceMap = mc->GetService(axServiceReferenceU);
 	auto axService = (sl::ax::engine::AutexousiousService*) axServiceMap["sl::ax::engine::AutexousiousService"];
