@@ -31,27 +31,33 @@ The executable will be output as `bin/azriel_sl_ax_main_main`.
 
 ### Packaging
 
+The packaging scripts use `move` commands rather than copy for the shared libraries and executables so that when testing the packaged directory, there is no opportunity for the shared libraries to be loaded from the build directory.
+
 #### Linux
 
-	export PACKAGE_DIR=/tmp/pkg/
-	mkdir $PACKAGE_DIR
+```bash
+export PACKAGE_DIR=/tmp/pkg/
+mkdir $PACKAGE_DIR
 
-	cp $(find ./bii/build/ -type f -name *.so*) "/${PACKAGE_DIR}/lib/"
-	cp ./bin/azriel_sl_ax_main_main "/${PACKAGE_DIR}/"
+mv -f $(find ./bii/build/ -type f -name *.so*) "/${PACKAGE_DIR}/lib/"
+mv -f ./bin/azriel_sl_ax_main_main "/${PACKAGE_DIR}/"
 
-	# Remove build directory so that the executable has no opportunity to load artifacts from it
-	rm -rf ./bii/build/
+cp -f -p ./packaging/linux/run.sh "/${PACKAGE_DIR}/"
+"/${PACKAGE_DIR}/run.sh"
+```
 
-	# 'run' script
-	cat > "/${PACKAGE_DIR}/run.sh" <<EOF
-	#!/bin/sh
-	CURRENT_DIR=$(dirname $0)
-	export LD_LIBRARY_PATH="${CURRENT_DIR}/lib":$LD_LIBRARY_PATH
+#### Windows
 
-	$CURRENT_DIR/azriel_sl_ax_main_main
-	EOF
-	chmod +x "/${PACKAGE_DIR}/run.sh"
-	"/${PACKAGE_DIR}/run.sh"
+```batch
+set PACKAGE_DIR=%TEMP%\pkg\
+md %PACKAGE_DIR%\lib
+
+move /Y .\bin\*.dll %PACKAGE_DIR%\lib
+move /Y .\bin\azriel_sl_ax_main_main.exe %PACKAGE_DIR%
+
+copy /Y .\packaging\windows\run.bat %PACKAGE_DIR%
+%PACKAGE_DIR%\run.bat
+```
 
 ## License
 
