@@ -61,5 +61,5 @@ int main(int argc, char const *argv[]) {
 	auto axServiceReferenceU = mc->GetServiceReference("sl::ax::engine::AutexousiousService");
 	auto axServiceMap = mc->GetService(axServiceReferenceU);
 	auto axService = (sl::ax::engine::AutexousiousService*) axServiceMap["sl::ax::engine::AutexousiousService"];
-	return axService->runApplication();
+	return axService->runApplication("sl::ax::engine::StartupActivity");
 }
